@@ -1,0 +1,7 @@
+interface:
+  display_name: "Check Intent"
+  short_description: "Audit work for intent drift"
+  default_prompt: "Use $check-intent to check whether this work has drifted from its intentions file."
+
+policy:
+  allow_implicit_invocation: true

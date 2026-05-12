@@ -1,0 +1,7 @@
+interface:
+  display_name: "Capture Intent"
+  short_description: "Refine and capture intent"
+  default_prompt: "Use $capture-intent to talk through this plan's intent and then write a checkable intentions file."
+
+policy:
+  allow_implicit_invocation: true

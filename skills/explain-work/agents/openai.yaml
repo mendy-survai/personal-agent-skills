@@ -1,0 +1,7 @@
+interface:
+  display_name: "Explain Work"
+  short_description: "Plain-English work orientation"
+  default_prompt: "Use $explain-work to explain what happened, what is known, and what I should do next."
+
+policy:
+  allow_implicit_invocation: true
