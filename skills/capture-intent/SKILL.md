@@ -1,6 +1,6 @@
 ---
 name: capture-intent
-description: Use after planning a feature, project slice, workstream, or implementation direction when the user asks to capture intent, preserve what they meant, talk through or refine intent, create/update a .intentions.md file, or make future drift checks possible. Starts with an inferred intent and can run a focused Q&A refinement loop before writing a scoped plain-English intentions file.
+description: Use after planning a feature, project slice, workstream, or implementation direction when the user asks to capture intent, preserve what they meant, talk through or refine intent, create/update a .intentions.md file, make future drift checks possible, or prepare a captured-intent handoff for a later /goal prompt. Starts with an inferred intent and can run a focused Q&A refinement loop before writing a scoped plain-English intentions file.
 ---
 
 # Capture Intent
@@ -15,9 +15,9 @@ It can also run a short conversational refinement pass before writing, especiall
 
 ## Pair Contract
 
-This skill writes the intent record. `check-intent` later reads that record to decide whether current work still honors it.
+This skill writes the intent record. `check-intent` later reads that record to decide whether current work still honors it. `create-goal-prompt` can later use the captured intent as source truth for a focused `/goal` prompt.
 
-Write the file so a future agent can compare work against it without needing the original conversation. Capture the human outcome, the boundaries, and the drift signals clearly enough to be checked later.
+Write the file so a future agent can compare work against it without needing the original conversation. Capture the human outcome, the boundaries, and the drift signals clearly enough to be checked later or carried into a goal session.
 
 ## Core Rule
 
@@ -210,6 +210,35 @@ After writing the file, summarize:
 - Any clarifying assumptions
 - How to use it with `check-intent` in later sessions
 
+### 7. Optional Goal Handoff
+
+If the user asks for next steps, goal-session prep, or a `/goal` prompt, offer a compact handoff instead of turning this skill into a task planner. Do not generate a full goal prompt unless the user explicitly asks; hand off to `create-goal-prompt` for execution shaping.
+
+Use this shape:
+
+```markdown
+## Goal Prompt Seed
+
+Intent source: `<path to .intentions.md or "current conversation">`
+
+Protected intent:
+- <human outcome or must-stay-true principle the goal must preserve>
+
+Likely goal:
+- <next bounded executable slice, if clear>
+
+Non-goals:
+- <things the goal should not become>
+
+Drift risks:
+- <tempting mistakes to avoid>
+
+Open execution questions:
+- <only questions needed before a strong /goal run, or "None">
+```
+
+If there is no obvious next executable slice, say that the intent is captured and recommend deciding the next slice before creating a goal prompt.
+
 ## Verification
 
 Before finishing, check:
@@ -220,6 +249,7 @@ Before finishing, check:
 - At least one drift warning sign describes a realistic tempting mistake
 - Technical details appear only when they protect or threaten the intent
 - A future `check-intent` pass could evaluate the current work against the file without rereading the whole planning conversation
+- Any Goal Prompt Seed stays intent-level except for the likely next slice and open execution questions
 
 ## Style
 

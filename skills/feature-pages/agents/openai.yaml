@@ -1,0 +1,7 @@
+interface:
+  display_name: "Feature Pages"
+  short_description: "Create evidence-backed feature pages"
+  default_prompt: "Use $feature-pages to create repo-specific explainer and announcement pages for this finished feature."
+
+policy:
+  allow_implicit_invocation: true

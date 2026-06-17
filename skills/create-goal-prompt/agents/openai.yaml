@@ -1,0 +1,7 @@
+interface:
+  display_name: "Create Goal Prompt"
+  short_description: "Create an intent-aware /goal prompt"
+  default_prompt: "Use $create-goal-prompt to turn this idea or captured intent into a lean native Codex /goal prompt."
+
+policy:
+  allow_implicit_invocation: true

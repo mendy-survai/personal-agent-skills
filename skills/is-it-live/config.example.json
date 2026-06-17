@@ -1,0 +1,60 @@
+{
+  "_README": [
+    "Per-repo settings for is-it-live. TWO ways to configure (pick one):",
+    "  1. PREFERRED: drop a .is-it-live.json in your repo root (portable,",
+    "     travels with the repo, works in worktrees). Run `is_it_live.py --init`",
+    "     inside the repo to scaffold one.",
+    "  2. Central: copy this file to config.json (gitignored, stays on your",
+    "     machine) and key entries by absolute repo path, like the example below.",
+    "All fields are optional. With no config at all the tool still shows the",
+    "full local ladder up to MERGED — and if your repo is on GitHub with `gh`",
+    "installed, deployment records can prove LIVE with zero config.",
+    "Field guide:",
+    "  provider              vercel|netlify|fly|render|heroku|vm|custom|auto",
+    "  production_branch     the branch production deploys from (default: auto-detect)",
+    "  production_urls       URLs real users hit; probed for reachability",
+    "  version_sources       BEST upgrade: endpoints that echo the deployed commit",
+    "                        SHA. One entry per deploy surface (frontend, backend...).",
+    "                        'json_path' picks a field when the endpoint returns JSON.",
+    "  health_url            a health endpoint, shown for context",
+    "  bundle_regex          regex for a fingerprintable build asset in the HTML",
+    "  deploy_workflows      GitHub Actions workflow names whose successful runs",
+    "                        prove a deploy (default: any workflow named *deploy*)",
+    "  ignore_branch_prefixes branch prefixes to hide from the 'notable unmerged' list",
+    "  components            the project-specific visual layer: named parts of the",
+    "                        codebase (paths = dir prefixes or globs). Each shows up",
+    "                        as a card: where its newest change sits on the ladder,",
+    "                        dirty files, recent activity. importance is a free-text",
+    "                        badge (e.g. core).",
+    "  notes                 one evergreen line about what production IS; date any",
+    "                        temporal claim, e.g. 'as of 2026-06-01: ...'"
+  ],
+
+  "/absolute/path/to/your-repo": {
+    "provider": "vercel",
+    "production_branch": "main",
+    "production_urls": ["https://your-prod-domain.com"],
+    "version_sources": [
+      {
+        "label": "frontend",
+        "url": "https://your-prod-domain.com/api/version",
+        "json_path": "commit"
+      },
+      {
+        "label": "backend",
+        "url": "https://api.your-prod-domain.com/healthz",
+        "json_path": "release_sha"
+      }
+    ],
+    "health_url": "https://api.your-prod-domain.com/healthz",
+    "bundle_regex": "index-[A-Za-z0-9]+\\.js",
+    "deploy_workflows": [],
+    "ignore_branch_prefixes": [],
+    "components": [
+      {"name": "Web app", "paths": ["app/", "src/"], "importance": "core"},
+      {"name": "API backend", "paths": ["api/"], "importance": "core"},
+      {"name": "Docs", "paths": ["docs/"]}
+    ],
+    "notes": "One evergreen line about what production is."
+  }
+}

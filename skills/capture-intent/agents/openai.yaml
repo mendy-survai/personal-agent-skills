@@ -1,7 +1,7 @@
 interface:
   display_name: "Capture Intent"
-  short_description: "Refine and capture intent"
-  default_prompt: "Use $capture-intent to talk through this plan's intent and then write a checkable intentions file."
+  short_description: "Capture intent and goal handoff"
+  default_prompt: "Use $capture-intent to refine this plan's intent, write a checkable intentions file, and prepare a goal handoff if useful."
 
 policy:
   allow_implicit_invocation: true

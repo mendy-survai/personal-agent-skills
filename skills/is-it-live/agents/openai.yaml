@@ -1,0 +1,7 @@
+interface:
+  display_name: "Is It Live"
+  short_description: "Where does my code stand — dirty tree to live, in plain English"
+  default_prompt: "Use $is-it-live to show where my recent work stands, from dirty working tree to live in production, and generate the HTML report."
+
+policy:
+  allow_implicit_invocation: true
