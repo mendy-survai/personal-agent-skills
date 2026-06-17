@@ -1,54 +1,104 @@
-# Personal Agent Skills
+# Mendy's Agent Skills
 
-Portable personal skills for Codex and Claude Code.
+Portable agent skills for Codex and Claude Code.
 
-## Skills
+These are small workflows I use to make AI coding agents more useful: checking
+what is actually live, turning shipped work into launch pages, preserving intent,
+and explaining what happened in plain English.
 
-- `capture-intent`: refine and capture project intent in a checkable `.intentions.md` file
-- `check-intent`: review current work against an intentions file
-- `create-goal-prompt`: clarify rough work and produce an optimized native Codex `/goal` prompt
-- `explain-work`: explain recent agent work in plain English
-- `feature-pages`: create evidence-backed, codebase-specific explainer and announcement pages for shipped work
-- `is-it-live`: map recent work from dirty local changes through GitHub, deploys, and production
+## Easiest Install
 
-## Install
+Paste this into Codex or Claude Code:
 
-From this repo:
+```text
+Install Mendy's agent skills from https://github.com/mendy-survai/personal-agent-skills, then show me what skills are available.
+```
+
+The agent should clone this repo, run the installer, verify the install, and tell
+you what to try first.
+
+## One Terminal Command
+
+If you are comfortable pasting a command into Terminal:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mendy-survai/personal-agent-skills/main/bootstrap.sh | bash
+```
+
+That installs the whole pack into both:
+
+- `~/.codex/skills`
+- `~/.claude/skills`
+
+After installing, start a new Codex or Claude Code session so the skill list is
+reloaded.
+
+## What You Get
+
+| If you want to... | Use this skill |
+| --- | --- |
+| Know whether recent code is actually live | `is-it-live` |
+| Turn shipped work into an explainer or announcement page | `feature-pages` |
+| Capture what you meant before implementation drifts | `capture-intent` |
+| Check current work against captured intent | `check-intent` |
+| Turn a rough idea into a strong Codex `/goal` prompt | `create-goal-prompt` |
+| Understand what an agent just did in plain English | `explain-work` |
+
+## Try It
+
+After install, ask naturally:
+
+```text
+Use is-it-live to tell me where this repo stands.
+```
+
+```text
+Use feature-pages to create a launch page for this completed feature.
+```
+
+```text
+Use capture-intent before we build this.
+```
+
+## Manual Install
+
+If you already cloned this repo:
 
 ```bash
 ./install.sh
 ```
 
-The installer links each skill into:
+To see available skills:
 
-- `~/.codex/skills/<skill>`
-- `~/.claude/skills/<skill>`
+```bash
+./install.sh --list
+```
 
-Existing local skill folders are moved to `~/.agent-skill-backups/<timestamp>/` before linking.
+To install just one skill:
 
-After installing, start a new Codex or Claude Code session so skill metadata is reloaded.
+```bash
+./install.sh is-it-live
+```
 
-To verify the links without changing anything:
+To verify the installed links:
 
 ```bash
 ./install.sh --verify
 ```
 
-## Usage
+## How Install Works
 
-Invoke the same skill by the runtime's native syntax:
+The installer links each skill folder into Codex and Claude Code. Existing local
+skill folders with the same names are moved to:
 
 ```text
-Codex:      Use $capture-intent to capture this plan.
-Codex:      Use $create-goal-prompt to turn this into a /goal prompt.
-
-Claude Code: /capture-intent Capture this plan.
-Claude Code: /create-goal-prompt Turn this into a /goal prompt.
+~/.agent-skill-backups/<timestamp>/
 ```
 
-The skill source of truth stays in this repo. The home-directory entries are symlinks, so edits here are picked up by new sessions after install/link verification.
+The default is to install the whole pack. You choose what to use later by asking
+Codex or Claude Code for the skill you want.
 
-## New Machine Setup
+## For New Machines
 
 ```bash
 git clone https://github.com/mendy-survai/personal-agent-skills.git ~/code/personal-agent-skills
@@ -56,4 +106,5 @@ cd ~/code/personal-agent-skills
 ./install.sh
 ```
 
-Codex uses the `agents/openai.yaml` metadata. Claude Code should ignore that extra metadata folder and load the `SKILL.md` files by slash command.
+Codex uses the `agents/openai.yaml` metadata. Claude Code should ignore that
+extra metadata folder and load the `SKILL.md` files by slash command.

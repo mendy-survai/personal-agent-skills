@@ -4,7 +4,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_DIR="$ROOT/skills"
 BACKUP_DIR="$HOME/.agent-skill-backups/$(date +%Y%m%d-%H%M%S)"
-MODE="${1:-install}"
+MODE="install"
+requested_skills=()
 
 targets=(
   "${CODEX_HOME:-$HOME/.codex}/skills"
@@ -13,13 +14,19 @@ targets=(
 
 usage() {
   cat <<EOF
-Usage: ./install.sh [--verify]
+Usage:
+  ./install.sh                 Install every skill
+  ./install.sh all             Install every skill
+  ./install.sh is-it-live      Install one or more named skills
+  ./install.sh --list          Show available skills
+  ./install.sh --verify        Verify installed links
 
 Links each skill into:
   ${CODEX_HOME:-$HOME/.codex}/skills
   ${CLAUDE_HOME:-$HOME/.claude}/skills
 
-Use --verify to check that installed links point back to this repo.
+The default is the whole pack. Choose later by asking Codex or Claude Code for
+the skill you want, for example: "Use is-it-live on this repo."
 EOF
 }
 
@@ -28,15 +35,100 @@ if [[ ! -d "$SKILLS_DIR" ]]; then
   exit 1
 fi
 
-case "$MODE" in
-  install|"") ;;
-  --verify|verify) MODE="verify" ;;
-  -h|--help) usage; exit 0 ;;
-  *)
-    usage >&2
-    exit 2
-    ;;
-esac
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    install)
+      MODE="install"
+      ;;
+    all)
+      ;;
+    --verify|verify)
+      MODE="verify"
+      ;;
+    --list|list)
+      MODE="list"
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      while [[ $# -gt 0 ]]; do
+        requested_skills+=("$1")
+        shift
+      done
+      break
+      ;;
+    -*)
+      usage >&2
+      exit 2
+      ;;
+    *)
+      requested_skills+=("$1")
+      ;;
+  esac
+  shift
+done
+
+should_include_skill() {
+  local skill="$1"
+
+  if [[ "${#requested_skills[@]}" -eq 0 ]]; then
+    return 0
+  fi
+
+  local requested
+  for requested in "${requested_skills[@]}"; do
+    if [[ "$requested" == "$skill" ]]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+list_skills() {
+  local src
+  local skill
+  local description
+
+  for src in "$SKILLS_DIR"/*; do
+    [[ -d "$src" ]] || continue
+    [[ -f "$src/SKILL.md" ]] || continue
+    skill="$(basename "$src")"
+    description=""
+    if [[ -f "$src/agents/openai.yaml" ]]; then
+      description="$(awk -F'"' '/short_description:/ {print $2; exit}' "$src/agents/openai.yaml")"
+    fi
+    if [[ -z "$description" ]]; then
+      description="$(awk -F': ' '/^description:/ {print $2; exit}' "$src/SKILL.md")"
+    fi
+    printf '%-22s %s\n' "$skill" "$description"
+  done
+}
+
+missing_requested=()
+if [[ "${#requested_skills[@]}" -gt 0 ]]; then
+  for requested in "${requested_skills[@]}"; do
+    if [[ ! -f "$SKILLS_DIR/$requested/SKILL.md" ]]; then
+      missing_requested+=("$requested")
+    fi
+  done
+fi
+
+if [[ "${#missing_requested[@]}" -gt 0 ]]; then
+  echo "Unknown skill(s): ${missing_requested[*]}" >&2
+  echo >&2
+  echo "Available skills:" >&2
+  list_skills >&2
+  exit 2
+fi
+
+if [[ "$MODE" == "list" ]]; then
+  list_skills
+  exit 0
+fi
 
 link_skill() {
   local src="$1"
@@ -101,6 +193,7 @@ failed=0
 for src in "$SKILLS_DIR"/*; do
   [[ -d "$src" ]] || continue
   [[ -f "$src/SKILL.md" ]] || continue
+  should_include_skill "$(basename "$src")" || continue
 
   for target_root in "${targets[@]}"; do
     if [[ "$MODE" == "verify" ]]; then
